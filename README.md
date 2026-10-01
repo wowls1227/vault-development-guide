@@ -19,7 +19,7 @@ AppRole auth method로 인증한 뒤 **HTTP API 요청을 받아 KV v2 시크릿
 | 항목 | 버전 | 용도 | 확인 명령 |
 | --- | --- | --- | --- |
 | JDK | **17 이상** | 빌드·실행 (`record`, `java.net.http.HttpClient` 사용) | `java -version` |
-| Maven | **3.9 이상** (검증: 3.9.11) | 빌드. 3.8 이하는 기본 컴파일러 플러그인이 오래되어 Java 17 설정을 무시하고 빌드에 실패합니다 | `mvn -v` |
+| Maven | **3.6.3 이상** (검증: 3.6.3, 3.9.11) | 빌드. pom에 고정한 컴파일러 플러그인(3.13.0)이 3.6.3 이상을 요구합니다 | `mvn -v` |
 | Docker + Docker Compose v2 | Docker 20.10 이상, `docker compose` 명령 | Vault OSS dev 컨테이너 실행 | `docker version`, `docker compose version` |
 | bash, curl | - | 스크립트 실행, API 호출 | `bash --version`, `curl --version` |
 | jq | - | (선택) 예시 명령의 JSON 출력 정리 | `jq --version` |
@@ -47,26 +47,25 @@ Docker는 [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y openjdk-17-jdk jq curl
+sudo apt-get install -y openjdk-17-jdk maven jq curl
 ```
 
 ### 설치: Linux (RHEL / Rocky / Alma 8·9)
 
 ```bash
 sudo dnf install -y java-17-openjdk-devel jq curl
+
+# 9.x: 기본 Maven 이 3.6.3 이므로 그대로 설치
+sudo dnf install -y maven
+
+# 8.x: 기본 Maven 스트림이 3.5 라서 더 높은 스트림을 켠 뒤 설치 (사용 가능한 스트림: dnf module list maven)
+sudo dnf module enable -y maven:3.8
+sudo dnf install -y maven
 ```
 
-### 설치: Linux 공통 — Maven, Docker
+> 배포판 Maven은 설치할 때 다른 버전의 JDK(8이나 11)를 함께 설치하는 경우가 있습니다. 설치한 뒤 반드시 아래 "설치 확인"에서 `mvn -v`의 Java 버전을 확인하세요.
 
-배포판 패키지의 Maven은 3.6.x인 경우가 많습니다(Ubuntu 22.04, RHEL 9). 그래서 Apache 배포본으로 설치합니다.
-
-```bash
-MVN=3.9.11
-curl -fsSLO https://archive.apache.org/dist/maven/maven-3/$MVN/binaries/apache-maven-$MVN-bin.tar.gz
-sudo tar -xzf apache-maven-$MVN-bin.tar.gz -C /opt
-echo "export PATH=/opt/apache-maven-$MVN/bin:\$PATH" >> ~/.bashrc
-source ~/.bashrc
-```
+### 설치: Linux 공통 — Docker
 
 Docker Engine과 Compose 플러그인은 공식 문서대로 설치합니다([Ubuntu](https://docs.docker.com/engine/install/ubuntu/) · [Debian](https://docs.docker.com/engine/install/debian/) · [RHEL](https://docs.docker.com/engine/install/rhel/)). 설치한 뒤 `sudo` 없이 쓰려면 사용자를 `docker` 그룹에 추가하고 다시 로그인합니다.
 
@@ -80,12 +79,20 @@ sudo usermod -aG docker $USER
 
 ```bash
 java -version            # openjdk version "17..." 이상
-mvn -v                   # Apache Maven 3.9.x 이상, 그리고 "Java version: 17..." 이상인지 확인
+mvn -v                   # Apache Maven 3.6.3 이상, 그리고 "Java version: 17..." 이상인지 확인
 docker version           # Server 항목이 보여야 함 (Docker 데몬 실행 중)
 docker compose version   # Docker Compose version v2.x
 ```
 
 `mvn -v`에 나오는 Java 버전이 17보다 낮으면, Maven이 다른 JDK를 쓰고 있는 것입니다. `JAVA_HOME`을 JDK 17 경로로 설정하세요.
+
+```bash
+# Linux 예시 (경로는 배포판마다 다름: readlink -f "$(which javac)" 로 확인)
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64      # Ubuntu / Debian
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk            # RHEL 계열
+```
+
+배포판 Maven이 3.6.3보다 낮다면 [Apache Maven 배포본](https://maven.apache.org/download.cgi)을 받아 압축을 풀고, `bin` 디렉터리를 `PATH`에 추가하세요.
 
 ## 빠른 시작
 
