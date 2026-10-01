@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="740" viewBox="0 0 1420 740"
+     font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <!-- 구성도: Vault / 오케스트레이터 / Java 앱 컴포넌트와 호출 관계 (docs/DEVELOPMENT_GUIDE.md 4.1) -->
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .t  { fill:#111827; font-size:15px; font-weight:700; }
+      .s  { fill:#4b5563; font-size:12px; }
+      .l  { fill:#374151; font-size:12px; }
+      .m  { font-family:'SF Mono',Menlo,Consolas,monospace; }
+      .ln { stroke:#374151; stroke-width:1.6; fill:none; marker-end:url(#arr); }
+    </style>
+  </defs>
+
+  <rect width="1420" height="740" fill="#ffffff"/>
+
+  <!-- ===== Vault ===== -->
+  <rect x="290" y="16" width="900" height="104" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="306" y="40" class="t">HashiCorp Vault</text>
+  <g>
+    <rect x="320" y="52" width="180" height="52" rx="8" fill="#fff" stroke="#6b7280"/>
+    <text x="410" y="75" text-anchor="middle" class="t m" style="font-size:14px">sys/wrapping</text>
+    <text x="410" y="94" text-anchor="middle" class="s">wrapping 토큰</text>
+
+    <rect x="540" y="52" width="180" height="52" rx="8" fill="#fff" stroke="#6b7280"/>
+    <text x="630" y="75" text-anchor="middle" class="t m" style="font-size:14px">auth/token</text>
+    <text x="630" y="94" text-anchor="middle" class="s">토큰 갱신 / 조회 / 폐기</text>
+
+    <rect x="760" y="52" width="180" height="52" rx="8" fill="#fff" stroke="#6b7280"/>
+    <text x="850" y="75" text-anchor="middle" class="t m" style="font-size:14px">auth/approle</text>
+    <text x="850" y="94" text-anchor="middle" class="s">로그인 / secret-id</text>
+
+    <rect x="980" y="52" width="180" height="52" rx="8" fill="#fff" stroke="#6b7280"/>
+    <text x="1070" y="75" text-anchor="middle" class="t m" style="font-size:14px">secret/</text>
+    <text x="1070" y="94" text-anchor="middle" class="s">KV v2</text>
+  </g>
+
+  <!-- ===== 오케스트레이터 / secret-id 파일 ===== -->
+  <rect x="20" y="28" width="190" height="80" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="115" y="56" text-anchor="middle" class="t">오케스트레이터</text>
+  <text x="115" y="76" text-anchor="middle" class="s">CI/CD · 배포 시스템</text>
+  <text x="115" y="94" text-anchor="middle" class="s">전용 토큰: secret-id 발급만</text>
+  <path d="M210,68 L288,68" class="ln"/>
+  <text x="249" y="60" text-anchor="middle" class="l">발급</text>
+
+  <rect x="20" y="300" width="190" height="70" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="115" y="328" text-anchor="middle" class="t m" style="font-size:14px">.vault/secret-id</text>
+  <text x="115" y="350" text-anchor="middle" class="s">파일 (앱은 읽기만 함)</text>
+  <path d="M115,108 L115,298" class="ln"/>
+  <text x="125" y="200" class="l">원자적 교체</text>
+  <text x="125" y="216" class="l">(tmp → mv)</text>
+
+  <!-- ===== Java 앱 경계 ===== -->
+  <rect x="290" y="160" width="900" height="560" rx="12" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="8 5"/>
+  <text x="306" y="186" class="t" style="fill:#374151">Java 앱</text>
+  <text x="306" y="203" class="s m">sample-app</text>
+
+  <!-- 컴포넌트: 1행 -->
+  <rect x="320" y="300" width="180" height="70" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="410" y="324" text-anchor="middle" class="t" style="font-size:14px">SecretIdFileWatcher</text>
+  <text x="410" y="343" text-anchor="middle" class="s m">[vault-scheduler]</text>
+  <text x="410" y="361" text-anchor="middle" class="s">5초마다 파일 확인</text>
+
+  <rect x="540" y="300" width="180" height="70" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="630" y="324" text-anchor="middle" class="t" style="font-size:14px">TokenRenewer</text>
+  <text x="630" y="343" text-anchor="middle" class="s m">[vault-scheduler]</text>
+  <text x="630" y="361" text-anchor="middle" class="s">20초마다 renew-self</text>
+
+  <rect x="980" y="300" width="180" height="70" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1070" y="324" text-anchor="middle" class="t" style="font-size:14px">KvSecretClient</text>
+  <text x="1070" y="343" text-anchor="middle" class="s m">[api-N]</text>
+  <text x="1070" y="361" text-anchor="middle" class="s">KV v2 조회 / 저장</text>
+
+  <!-- 컴포넌트: 2행 -->
+  <rect x="980" y="430" width="180" height="70" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1070" y="454" text-anchor="middle" class="t" style="font-size:14px">KvApiServer</text>
+  <text x="1070" y="473" text-anchor="middle" class="s m">[api-1..8]</text>
+  <text x="1070" y="491" text-anchor="middle" class="s">127.0.0.1:8080</text>
+
+  <!-- 외부 HTTP 클라이언트 -->
+  <rect x="1230" y="430" width="170" height="70" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="1315" y="460" text-anchor="middle" class="t" style="font-size:14px">HTTP 클라이언트</text>
+  <text x="1315" y="480" text-anchor="middle" class="s">GET · PUT /v1/kv/{path}</text>
+  <path d="M1230,465 L1162,465" class="ln"/>
+
+  <!-- TokenManager -->
+  <rect x="320" y="570" width="840" height="130" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <text x="340" y="598" class="t" style="font-size:17px">TokenManager</text>
+  <text x="470" y="598" class="s">공유 토큰과 secret-id 관리 (모든 로그인이 여기서만 일어남)</text>
+  <text x="340" y="624" class="l"><tspan class="m" font-weight="700">token</tspan>  AtomicReference&lt;VaultToken&gt; — 요청 스레드가 락 없이 읽음, renew 는 CAS 로 반영</text>
+  <text x="340" y="646" class="l"><tspan class="m" font-weight="700">credential</tspan>  AtomicReference&lt;SecretIdCredential&gt; — 다음 로그인에 쓸 secret-id 와 만료 시각</text>
+  <text x="340" y="668" class="l"><tspan class="m" font-weight="700">loginLock</tspan>  로그인 / secret-id 교체는 한 스레드만 (single-flight)</text>
+  <text x="340" y="690" class="l"><tspan font-weight="700">로그인 실패 보호</tspan>  secret-id 만료 · 거부, 잠금 대기 중에는 Vault 에 로그인을 보내지 않음</text>
+
+  <!-- ===== 호출: 앱 → Vault ===== -->
+  <path d="M410,300 L410,106" class="ln"/>
+  <text x="418" y="200" class="l">lookup · unwrap</text>
+  <text x="418" y="216" class="l">(wrapped 모드)</text>
+
+  <path d="M630,300 L630,106" class="ln"/>
+  <text x="638" y="200" class="l">renew-self</text>
+  <text x="638" y="216" class="l">lookup-self</text>
+
+  <path d="M850,570 L850,106" class="ln"/>
+  <text x="858" y="192" class="l">login</text>
+  <text x="858" y="208" class="l">secret-id lookup</text>
+  <text x="858" y="224" class="l">lookup-self · revoke-self</text>
+
+  <path d="M1070,300 L1070,106" class="ln"/>
+  <text x="1078" y="208" class="l">KV read / write</text>
+
+  <!-- ===== 앱 내부 호출 ===== -->
+  <path d="M212,335 L318,335" class="ln"/>
+  <text x="250" y="326" text-anchor="middle" class="l">5초 폴링</text>
+
+  <path d="M1070,430 L1070,372" class="ln"/>
+  <text x="1078" y="406" class="l">read / write</text>
+
+  <path d="M410,370 L410,568" class="ln"/>
+  <text x="418" y="474" class="l">switchSecretId</text>
+
+  <path d="M630,370 L630,568" class="ln"/>
+  <text x="638" y="466" class="l">applyRenewal</text>
+  <text x="638" y="482" class="l">refreshIfStale</text>
+
+  <path d="M980,345 L955,345 L955,568" class="ln"/>
+  <text x="963" y="540" class="l">executeWithToken</text>
+</svg>

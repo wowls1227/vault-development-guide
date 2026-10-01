@@ -1,0 +1,15 @@
+# Vault OSS 개발(dev) 모드 컨테이너
+# - dev 모드: 메모리 저장소, 자동 unseal, KV v2 가 secret/ 에 기본 활성화됨
+# - 컨테이너를 내리면 모든 데이터가 사라진다 (테스트 전용)
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault-dev
+    ports:
+      - "${VAULT_HOST_PORT:-8200}:8200"      # 호스트 포트 변경: VAULT_HOST_PORT=18200 docker compose up -d
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root          # dev 모드 root 토큰 (setup 스크립트가 사용)
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200 # 호스트에서 접근할 수 있도록 모든 인터페이스에 바인딩
+    cap_add:
+      - IPC_LOCK                             # 메모리 스왑 방지(mlock)
+    command: server -dev

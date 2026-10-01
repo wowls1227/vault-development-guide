@@ -1,0 +1,4 @@
+target/
+# setup-vault.sh 산출물 (role-id / secret-id 포함)
+approle.env
+.vault/
