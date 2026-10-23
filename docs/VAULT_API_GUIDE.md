@@ -35,7 +35,7 @@
 
 ## 2. 공통 사항
 
-### 2.1 `VaultHttpClient` — 모든 Vault 호출이 거치는 저수준 클라이언트
+### 2.1 `VaultHttpClient` — 모든 Vault 호출이 거치는 클라이언트
 
 | 메서드 | 설명 |
 | --- | --- |
@@ -48,7 +48,7 @@
 | --- | --- |
 | URL | `{VAULT_ADDR}/v1/` + path. 예: `path="auth/approle/login"` → `http://127.0.0.1:8200/v1/auth/approle/login` |
 | `X-Vault-Token` 헤더 | `token` 인자가 `null`이 아니면 추가 (로그인/unwrap lookup은 `null`) |
-| `X-Vault-Namespace` 헤더 | `VAULT_NAMESPACE`가 설정된 경우만 추가 (Enterprise 전용) |
+| `X-Vault-Namespace` 헤더 | `VAULT_NAMESPACE`가 설정된 경우만 추가 (Enterprise 전용). 로그인처럼 토큰이 없는 요청에도 붙음. OSS는 이 헤더를 무시하고 root에서 처리. 상세는 [VAULT_API_SPEC.md](VAULT_API_SPEC.md) 1.5절 |
 | 타임아웃 | 연결 5초, 요청 10초 |
 | 2xx 응답 | 응답 JSON을 `JsonNode`로 반환. 204(바디 없음)는 `MissingNode` 반환 |
 | 2xx 외 응답 | `VaultException(statusCode, message)`을 던짐 |

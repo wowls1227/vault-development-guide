@@ -8,6 +8,8 @@
 #  - 파일은 임시 파일에 쓴 뒤 mv 로 교체한다. 앱이 쓰다 만 파일을 읽는 일이 없도록 하기 위함.
 #  - ORCH_WRAPPED=true 면 secret-id 원문 대신 response-wrapping 토큰을 전달한다.
 #    (1회용이고 WRAP_TTL 안에 앱이 unwrap 해야 함. 앱도 VAULT_SECRET_ID_WRAPPED=true 로 실행)
+#  - 오케스트레이터 토큰은 period 24h 인 periodic 토큰이라, 24시간 안에 갱신하지 않으면 만료된다.
+#    그래서 전달할 때마다 먼저 토큰을 갱신(renew-self)한다. (default 정책에 포함된 권한)
 #
 # 사용법
 #   ./scripts/deliver-secret-id.sh             # 1회 전달
@@ -29,8 +31,23 @@ WRAP_TTL=${WRAP_TTL:-5m}
 # 컨테이너 안의 vault CLI 를 오케스트레이터 토큰으로 실행하는 헬퍼
 v() { docker exec -i -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN="$ORCH_VAULT_TOKEN" "$CONTAINER" vault "$@"; }
 
+# 오케스트레이터 토큰 갱신 (TTL 을 period 만큼 다시 채움). 이미 만료되었으면 갱신할 수 없으므로 안내 후 종료한다.
+renew_orch_token() {
+  local out
+  # auth/token/renew-self 호출. -field 로 갱신된 TTL(초)만 받는다. (vault token renew 는 -field 를 지원하지 않음)
+  if ! out=$(v write -f -field=token_duration auth/token/renew-self 2>&1); then
+    echo "[$(date +%T)] 오케스트레이터 토큰 갱신 실패 (만료되었거나 폐기됨):" >&2
+    echo "$out" | grep -E '^\s*\*|Code:' >&2 || echo "$out" >&2
+    echo "  → ./scripts/setup-vault.sh 를 다시 실행해 새 오케스트레이터 토큰을 발급하세요." >&2
+    exit 1
+  fi
+  echo "[$(date +%T)] 오케스트레이터 토큰 갱신 완료 (TTL ${out}s)"
+}
+
 deliver() {
   local value
+  renew_orch_token
+
   if [[ "$ORCH_WRAPPED" == "true" ]]; then
     # 응답을 wrapping 토큰으로 감싸서 받는다. 오케스트레이터는 secret-id 원문을 보지 않는다.
     value=$(v write -wrap-ttl="$WRAP_TTL" -field=wrapping_token -f "auth/approle/role/$ORCH_ROLE_NAME/secret-id")
