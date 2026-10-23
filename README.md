@@ -14,8 +14,7 @@ AppRole auth method로 인증한 뒤 **HTTP API 요청을 받아 KV v2 시크릿
 | [docs/DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md) | 개발 가이드: 설계 고려사항, 작업 이력, 동작 로직, 동시성, 예외/에러 처리, 운영 |
 | [docs/VAULT_API_GUIDE.md](docs/VAULT_API_GUIDE.md) | Java 함수별 Vault HTTP API와 실제 request/response |
 | [docs/VAULT_API_SPEC.md](docs/VAULT_API_SPEC.md) | API 정의서: 앱·오케스트레이터·관리자가 쓰는 전체 API의 파라미터, 응답 필드, 권한, 오류 |
-| [docs/KV_API_GUIDE.md](docs/KV_API_GUIDE.md) | KV v2 저장·조회·업데이트·변경·삭제와 메타데이터, AppRole / Certificate 인증 |
-| [docs/VAULT_PERMISSIONS.md](docs/VAULT_PERMISSIONS.md) | Vault 권한: 주체별 정책, 경로별 권한 확인 결과, 권한 변경 반영 시점, 권한 오류 대응 |
+| [docs/KV_API_GUIDE.md](docs/KV_API_GUIDE.md) | KV v2 저장·조회·업데이트·변경·삭제와 메타데이터, AppRole / Certificate 인증 || [docs/VAULT_PERMISSIONS.md](docs/VAULT_PERMISSIONS.md) | Vault 권한: 주체별 정책, 경로별 권한 확인 결과, 권한 변경 반영 시점, 권한 오류 대응 |
 
 ## 요구 사항
 
